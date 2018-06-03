@@ -1,0 +1,10 @@
+
+*.qmlc
+
+*.jsc
+
+*.user
+
+.DS_Store
+
+Thumbs.db

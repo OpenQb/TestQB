@@ -1,0 +1,22 @@
+{
+    "name"			: "TestQB",
+	"version"		: "1.0.0",
+    "build"         : 1,
+    "namespace"		: "com.github.openqb.TestQB",
+	
+	"supportedOs"   : ["android","ios","osx","windows","linux"],
+    "tags"          : "test",
+
+	"category"      : "Applications",
+    "subCategory"   : "Libraries & Demo",
+    "genre"   		: "Libraries & Demo",
+	
+    "minQbVersion"  : "1.0.0",
+    "appVariant"    : "APP",
+    "packageVariant": "QXP",
+
+    "description"   : "TestQB is a visual tool to test different components of Qb",
+
+    "author"		: [{"name":"Kawser","link":"https://github.com/mkawserm"}],
+    "projectLink"	: [{"name":"GitHub","link":"openqb/TestQB"}]
+}
