@@ -104,7 +104,7 @@ PageI{
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: QbCoreOne.scale(120)
+        width: QbCoreOne.scale(160)
         color: "lightgrey"
         GridView{
             id: objButtonGrids
@@ -118,7 +118,7 @@ PageI{
                 height: QbCoreOne.scale(50)
                 Button{
                     anchors.centerIn: parent
-                    width: parent.width*0.90
+                    width: parent.width
                     height: parent.height
                     text: name;
                     Material.background: appJS.theme.secondary
