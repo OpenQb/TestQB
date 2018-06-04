@@ -16,6 +16,40 @@ PageTI{
             var t = "STATUS  {Number:"+n+"} {Context: "+context+"} {Message: "+message+"}";
             addLog(t,"lightblue");
         }
+        onProcessingChanged: {
+            addLog("Processing changed: "+processing,"lightblue");
+        }
+    }
+
+    function test_read_from_net(){
+        pageFileIO.disableOtherTask();
+        addLog("");
+        addLog("== READ FROM NET ==","blue");
+        var p1 = new QbPromise.Promise(function(res,rej){
+            var statusMethod = function(n,c,m){
+                objFileIO.onLoaded.disconnect(loadMethod);
+                objFileIO.onStatus.disconnect(statusMethod);
+                rej();
+            }
+
+            var loadMethod = function(data,pos){
+                pageFileIO.addLog("JSON DATA","grey");
+                pageFileIO.addGreenLog(data);
+                objFileIO.onLoaded.disconnect(loadMethod);
+                objFileIO.onStatus.disconnect(statusMethod);
+                res();
+            }
+            objFileIO.setHost("http://ip-api.com");
+            objFileIO.setTimeout(30);
+            objFileIO.setPath("/json");
+            objFileIO.onLoaded.connect(loadMethod);
+            objFileIO.onStatus.connect(statusMethod);
+            objFileIO.loadAll();
+
+        }).finally(function(){
+            pageFileIO.done();
+            pageFileIO.enableOtherTask();
+        });
     }
 
     function test_read_from_pack(){
@@ -24,6 +58,7 @@ PageTI{
         addLog("== READ FROM PACK ==","blue");
         var p1 = new QbPromise.Promise(function(res,rej){
             var statusMethod = function(n,c,m){
+                objFileIO.onLoaded.disconnect(loadMethod);
                 objFileIO.onStatus.disconnect(statusMethod);
                 rej();
             }
@@ -76,7 +111,9 @@ PageTI{
             };
 
             var statusMethod = function(n,c,m){
+                objFileIO.onLoaded.disconnect(loadMethod);
                 objFileIO.onStatus.disconnect(statusMethod);
+                objFileIO.onSaved.disconnect(savedMethod);
                 rej();
             }
 
