@@ -33,15 +33,17 @@ PageTI{
             }
 
             var loadMethod = function(data,pos){
-                pageFileIO.addLog("JSON DATA","grey");
+                pageFileIO.addLog("DATA","grey");
                 pageFileIO.addGreenLog(data);
                 objFileIO.onLoaded.disconnect(loadMethod);
                 objFileIO.onStatus.disconnect(statusMethod);
                 res();
             }
-            objFileIO.setHost("http://ip-api.com");
+            addLog("Reading from: https://api.ipify.org");
+            objFileIO.setHost("https://api.ipify.org");
             objFileIO.setTimeout(30);
-            objFileIO.setPath("/json");
+            objFileIO.setPath("/");
+            objFileIO.setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/11.1 Safari/605.1.15");
             objFileIO.onLoaded.connect(loadMethod);
             objFileIO.onStatus.connect(statusMethod);
             objFileIO.loadAll();
