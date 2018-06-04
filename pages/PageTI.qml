@@ -32,7 +32,14 @@ PageI{
     onCurrentTaskChanged: {
         if(doAllTask){
             if(currentTask<objPageTI.actionList.length){
-                objPageTI.actionList[currentTask]();
+                try{
+                    objPageTI.getTask(objPageTI.currentTask)();
+                }
+                catch(e){
+                    objPageTI.addRedLog("Exception occured while evaluating {"+objPageTI.getTask(index).name+"}");
+                    objPageTI.addRedLog("Exception: "+String(e));
+                    do_next_task();
+                }
             }
             else{
                 doAllTask = false;
@@ -51,7 +58,7 @@ PageI{
         if(objPageTI.actionList.length>1){
             objPageTI.doAllTask = true;
             try{
-                objPageTI.getTask(pageFileIO.currentTask)();
+                objPageTI.getTask(objPageTI.currentTask)();
             }
             catch(e){
                 objPageTI.addRedLog("Exception occured while evaluating {"+objPageTI.getTask(index).name+"}");
