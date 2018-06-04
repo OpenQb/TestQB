@@ -56,14 +56,16 @@ PageI{
 
     function test_all(){
         if(objPageTI.actionList.length>1){
-            objPageTI.doAllTask = true;
-            try{
-                objPageTI.getTask(objPageTI.currentTask)();
-            }
-            catch(e){
-                objPageTI.addRedLog("Exception occured while evaluating {"+objPageTI.getTask(index).name+"}");
-                objPageTI.addRedLog("Exception: "+String(e));
-                do_next_task();
+            if(!objPageTI.doAllTask){
+                objPageTI.doAllTask = true;
+                try{
+                    objPageTI.getTask(objPageTI.currentTask)();
+                }
+                catch(e){
+                    objPageTI.addRedLog("Exception occured while evaluating {"+objPageTI.getTask(index).name+"}");
+                    objPageTI.addRedLog("Exception: "+String(e));
+                    do_next_task();
+                }
             }
         }
         else{
