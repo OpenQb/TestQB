@@ -9,6 +9,7 @@ import QtQuick.Controls.Material 2.3
 PageTI{
     id: pageFileIO
     title: "FileIO"
+
     QbFileIO{
         id: objFileIO
         onStatus: {
@@ -17,8 +18,7 @@ PageTI{
         }
     }
 
-
-    function write_local_file(){
+    function test_write_local_file(){
         pageFileIO.disableOtherTask();
         var fileHost = pageFileIO.appJS.resolveDataPath("");
         var fileName = "/TestFile.txt";
@@ -65,22 +65,15 @@ PageTI{
 
             pageFileIO.addLog("Writing: 1234567890")
             objFileIO.save("1234567890");
-        });
-
-        p1.then(function(){
+        }).then(function(){
             pageFileIO.enableOtherTask();
             objFileIO.remove();
+            do_next_task();
         },function(){
             pageFileIO.enableOtherTask();
             objFileIO.remove();
+            do_next_task();
         });
-    }
-
-
-    onPageCreated: {
-        /** Fill up the actionList with task **/
-        pageFileIO.addTask("WRITE LOCAL FILE",write_local_file);
-
 
     }
 }

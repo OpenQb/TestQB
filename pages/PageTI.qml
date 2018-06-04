@@ -10,56 +10,104 @@ PageI{
     property bool isRunningAction: false
     property var actionList: []
 
-    topBar:Item{
-            Label{
-                anchors.fill: parent
-                text: objPageTI.title
-                font.bold: true
-                verticalAlignment: Label.AlignVCenter
+    property int currentTask: 1;
+    property bool doAllTask: false;
+
+    onPageCreated: {
+        var methods = QbCoreOne.objectMethods(objPageTI,"test_");
+        for(var i=0;i<methods.length;++i){
+            var name = methods[i];
+            name = name.replace("test_","");
+            name = name.replace(/_/g," ");
+            objPageTI.addTask(name,eval(methods[i]));
+        }
+    }
+
+    onCurrentTaskChanged: {
+        if(doAllTask){
+            if(currentTask<objPageTI.actionList.length){
+                objPageTI.actionList[currentTask]();
             }
+            else{
+                doAllTask = false;
+                currentTask = 1;
+            }
+        }
+    }
 
-            Item{
-                anchors.right: parent.right
-                height: parent.height
-                width: parent.height
+    function do_next_task(){
+        if(doAllTask){
+            ++currentTask;
+        }
+    }
 
-                Rectangle{
-                    width: parent.width*0.60
-                    height: width
+    function test_all(){
+        if(objPageTI.actionList.length>1){
+            objPageTI.doAllTask = true;
+            try{
+                objPageTI.getTask(pageFileIO.currentTask)();
+            }
+            catch(e){
+                objPageTI.addRedLog("Exception occured while evaluating {"+objPageTI.getTask(index).name+"}");
+                objPageTI.addRedLog("Exception: "+String(e));
+                do_next_task();
+            }
+        }
+        else{
+            objPageTI.addRedLog("No test found.");
+        }
+    }
+
+    topBar:Item{
+        Label{
+            anchors.fill: parent
+            text: objPageTI.title
+            font.bold: true
+            verticalAlignment: Label.AlignVCenter
+        }
+
+        Item{
+            anchors.right: parent.right
+            height: parent.height
+            width: parent.height
+
+            Rectangle{
+                width: parent.width*0.60
+                height: width
+                anchors.centerIn: parent
+                color: objPageTI.appJS.theme.secondary
+                radius: width/2.0
+                property color textColor: objPageTI.appJS.theme.textColor(objPageTI.appJS.theme.secondary)
+                Text{
+                    anchors.fill: parent
                     anchors.centerIn: parent
-                    color: objPageTI.appJS.theme.secondary
-                    radius: width/2.0
-                    property color textColor: objPageTI.appJS.theme.textColor(objPageTI.appJS.theme.secondary)
-                    Text{
-                        anchors.fill: parent
-                        anchors.centerIn: parent
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-                        text: QbMF3.icon("mf-clear_all")
-                        font.family: QbMF3.family
-                        color: parent.textColor
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: QbMF3.icon("mf-clear_all")
+                    font.family: QbMF3.family
+                    color: parent.textColor
+                }
+
+                MouseArea{
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onEntered: {
+                        var c = objPageTI.appJS.theme.tetradicColor(objPageTI.appJS.theme.primary)[2]
+                        parent.color = c;
+                        parent.textColor = objPageTI.appJS.theme.textColor(c);
+                    }
+                    onExited: {
+                        parent.color = objPageTI.appJS.theme.secondary;
+                        parent.textColor = objPageTI.appJS.theme.textColor(objPageTI.appJS.theme.secondary);
                     }
 
-                    MouseArea{
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onEntered: {
-                            var c = objPageTI.appJS.theme.tetradicColor(objPageTI.appJS.theme.primary)[2]
-                            parent.color = c;
-                            parent.textColor = objPageTI.appJS.theme.textColor(c);
-                        }
-                        onExited: {
-                            parent.color = objPageTI.appJS.theme.secondary;
-                            parent.textColor = objPageTI.appJS.theme.textColor(objPageTI.appJS.theme.secondary);
-                        }
-
-                        onClicked: {
-                            objPageTI.clearLog();
-                        }
+                    onClicked: {
+                        objPageTI.clearLog();
                     }
                 }
             }
         }
+    }
 
     function addTask(name,callable){
         objPageTI.actionList.push(callable);
@@ -125,7 +173,13 @@ PageI{
                     Material.foreground: appJS.theme.textColor(appJS.theme.secondary)
                     onClicked: {
                         if(!objPageTI.isRunningAction){
-                            objPageTI.getTask(index)();
+                            try{
+                                objPageTI.getTask(index)();
+                            }
+                            catch(e){
+                                objPageTI.addRedLog("Exception occured while evaluating {"+objPageTI.getTask(index).name+"}");
+                                objPageTI.addRedLog("Exception: "+String(e));
+                            }
                         }
                     }
                 }
@@ -141,35 +195,35 @@ PageI{
         anchors.bottom: parent.bottom
         color: "lightyellow"
         Flickable {
-             id: objFlickArea
-             anchors.fill: parent
+            id: objFlickArea
+            anchors.fill: parent
 
-             contentWidth: objLogBrowser.paintedWidth
-             contentHeight: objLogBrowser.paintedHeight
-             clip: true
+            contentWidth: objLogBrowser.paintedWidth
+            contentHeight: objLogBrowser.paintedHeight
+            clip: true
 
-             function ensureVisible(r)
-             {
-                 if (contentX >= r.x)
-                     contentX = r.x;
-                 else if (contentX+width <= r.x+r.width)
-                     contentX = r.x+r.width-width;
-                 if (contentY >= r.y)
-                     contentY = r.y;
-                 else if (contentY+height <= r.y+r.height)
-                     contentY = r.y+r.height-height;
-             }
+            function ensureVisible(r)
+            {
+                if (contentX >= r.x)
+                    contentX = r.x;
+                else if (contentX+width <= r.x+r.width)
+                    contentX = r.x+r.width-width;
+                if (contentY >= r.y)
+                    contentY = r.y;
+                else if (contentY+height <= r.y+r.height)
+                    contentY = r.y+r.height-height;
+            }
 
-             TextEdit {
-                 id: objLogBrowser
-                 width: objFlickArea.width
-                 focus: true
-                 wrapMode: TextEdit.Wrap
-                 onCursorRectangleChanged: objFlickArea.ensureVisible(cursorRectangle)
-                 readOnly: true
-                 textFormat: TextEdit.RichText
-             }
-         }
+            TextEdit {
+                id: objLogBrowser
+                width: objFlickArea.width
+                focus: true
+                wrapMode: TextEdit.Wrap
+                onCursorRectangleChanged: objFlickArea.ensureVisible(cursorRectangle)
+                readOnly: true
+                textFormat: TextEdit.RichText
+            }
+        }
 
 
         Item {
