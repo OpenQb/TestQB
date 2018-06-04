@@ -66,9 +66,9 @@ PageTI{
             pageFileIO.addLog("Writing: 1234567890")
             objFileIO.save("1234567890");
         }).finally(function(){
-            pageFileIO.enableOtherTask();
             objFileIO.remove();
-            do_next_task();
+            pageFileIO.enableOtherTask();
+            pageFileIO.done();
         });
 
     }

@@ -13,6 +13,12 @@ PageI{
     property int currentTask: 1;
     property bool doAllTask: false;
 
+    signal done();
+
+    onDone: {
+        do_next_task();
+    }
+
     onPageCreated: {
         var methods = QbCoreOne.objectMethods(objPageTI,"test_");
         for(var i=0;i<methods.length;++i){
