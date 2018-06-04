@@ -18,6 +18,35 @@ PageTI{
         }
     }
 
+    function test_read_from_pack(){
+        pageFileIO.disableOtherTask();
+        addLog("");
+        addLog("== READ FROM PACK ==","blue");
+        var p1 = new QbPromise.Promise(function(res,rej){
+            var statusMethod = function(n,c,m){
+                objFileIO.onStatus.disconnect(statusMethod);
+                rej();
+            }
+
+            var loadMethod = function(data,pos){
+                pageFileIO.addLog("JSON DATA","grey");
+                pageFileIO.addGreenLog(data);
+                objFileIO.onLoaded.disconnect(loadMethod);
+                objFileIO.onStatus.disconnect(statusMethod);
+                res();
+            }
+            objFileIO.setHost("appid://"+pageFileIO.appId);
+            objFileIO.setPath("/app.json");
+            objFileIO.onLoaded.connect(loadMethod);
+            objFileIO.onStatus.connect(statusMethod);
+            objFileIO.loadAll();
+
+        }).finally(function(){
+            pageFileIO.done();
+            pageFileIO.enableOtherTask();
+        });
+    }
+
     function test_write_local_file(){
         pageFileIO.disableOtherTask();
         var fileHost = pageFileIO.appJS.resolveDataPath("");
@@ -30,7 +59,7 @@ PageTI{
             fileHost = "file://"+fileHost;
         }
 
-
+        addLog("");
         addLog("== WRITE LOCAL FILE ==","blue");
         addLog("FilePath: "+fileHost+fileName);
 
@@ -56,6 +85,8 @@ PageTI{
                 if( String(data) === "1234567890") pageFileIO.addGreenLog("Success");
                 else pageFileIO.addRedLog("Failure");
                 objFileIO.onLoaded.disconnect(loadMethod);
+                objFileIO.onStatus.disconnect(statusMethod);
+                objFileIO.onSaved.disconnect(savedMethod);
                 res();
             }
 
